@@ -44,6 +44,7 @@ try:
 except ImportError:
     from logevent import LogEvent
 
+NUM_OF_NANOSECS_IN_A_SEC = 1000000000
 
 # Class for the influxdb Broker
 # Get broks and send them to influxdb
@@ -114,7 +115,7 @@ class InfluxdbBroker(BaseModule):
             if fields:
                 point = {
                     "measurement": 'metric_%s' % self.illegal_char.sub('_', e.name),
-                    "time": timestamp,
+                    "time": timestamp * NUM_OF_NANOSECS_IN_A_SEC,
                     "fields": fields,
                     "tags": tags,
                 }
@@ -137,7 +138,7 @@ class InfluxdbBroker(BaseModule):
                 {
                     "measurement": "EVENT",
                     "tags": tags,
-                    "time": data['last_chk'],
+                    "time": data['last_chk'] * NUM_OF_NANOSECS_IN_A_SEC,
                     "fields": {
                         "event_type": 'ALERT',
                         "state": data['state'],
@@ -162,7 +163,7 @@ class InfluxdbBroker(BaseModule):
             {
                 "measurement": name,
                 "tags": tags,
-                "time": data['last_chk'],
+                "time": data['last_chk'] * NUM_OF_NANOSECS_IN_A_SEC,
                 "fields": {
                     "state_type": data['state_type'],
                     'acknowledged': int(data['problem_has_been_acknowledged']),
@@ -261,7 +262,7 @@ class InfluxdbBroker(BaseModule):
         post_data.extend(
             self.get_check_result_perfdata_points(
                 b.data['perf_data'],
-                b.data['time_stamp'],
+                b.data['time_stamp'] * NUM_OF_NANOSECS_IN_A_SEC,
                 tags=tags
             )
         )
@@ -286,7 +287,7 @@ class InfluxdbBroker(BaseModule):
         post_data.extend(
             self.get_check_result_perfdata_points(
                 b.data['perf_data'],
-                b.data['time_stamp'],
+                b.data['time_stamp'] * NUM_OF_NANOSECS_IN_A_SEC,
                 tags=tags
             )
         )
@@ -312,7 +313,7 @@ class InfluxdbBroker(BaseModule):
 
             point = {
                 "measurement": "EVENT",
-                "time": event['time'],
+                "time": event['time'] * NUM_OF_NANOSECS_IN_A_SEC,
                 "fields": {},
                 "tags": {
                     "host_name": event['hostname'],
